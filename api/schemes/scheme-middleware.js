@@ -7,9 +7,9 @@ const Scheme = require('./scheme-model');
     "message": "scheme with scheme_id <actual id> not found"
   }
 */
-const checkSchemeId = (req, res, next) => {
-  const isExisting = Scheme.findById(req.params.scheme_id);
-  if (!isExisting[0]) {
+const checkSchemeId = async (req, res, next) => {
+  const isExisting = await Scheme.findById(req.params.scheme_id);
+  if(!isExisting) {
     res.status(404).json({message: `scheme with scheme_id ${req.params.scheme_id} not found`});
   } else {
     next();
@@ -25,8 +25,8 @@ const checkSchemeId = (req, res, next) => {
   }
 */
 const validateScheme = (req, res, next) => {
-  const sc = Number(req.body.scheme_name);
-  if(!sc || sc === undefined || typeof(sc) !== 'string') {
+  const sc = req.body.scheme_name;
+  if(!sc || sc === undefined || typeof sc !== 'string') {
     res.status(400).json({message: 'invalid scheme_name'});
   } else {
     next();
@@ -45,7 +45,7 @@ const validateScheme = (req, res, next) => {
 const validateStep = (req, res, next) => {
   const inst = req.body.instructions;
   const st = Number(req.body.step_number);
-  if (!inst || inst === undefined || typeof(inst) !== 'string' || typeof(st) !== 'number' || st > 1) {
+  if (!inst || inst === undefined || typeof inst !== 'string' || isNaN(st) || st < 1 || !st || st === undefined) {
     res.status(400).json({message: 'invalid step'});
   } else {
     next();

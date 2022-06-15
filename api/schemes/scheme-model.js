@@ -98,6 +98,10 @@ async function findById(scheme_id) { // EXERCISE B
     .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
     .where('sc.scheme_id', scheme_id)
     .orderBy('st.step_number')
+  
+    if (!schemeArray[0] || schemeArray[0] === undefined) {
+      return null;
+    }
 
   const stepsList = [];
   
@@ -161,8 +165,9 @@ async function add(scheme) { // EXERCISE D
   await db('schemes').insert(scheme);
   const newScheme = await db('schemes as sc')
     .select('sc.scheme_name', 'sc.scheme_id')
-    .where('sc.scheme_name', scheme.scheme_name);
-  return newScheme;
+    .where('sc.scheme_name', scheme.scheme_name)
+    .first();
+  return newScheme.scheme_id;
 }
 
 async function addStep(scheme_id, step) { // EXERCISE E
@@ -178,8 +183,13 @@ async function addStep(scheme_id, step) { // EXERCISE E
     instructions: step.instructions
   });
 
-  const newStep = await findById(scheme_id);
-  return newStep;
+  const res = await db('schemes as sc')
+    .select('st.step_number', 'st.instructions')
+    .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
+    .where('sc.scheme_id', scheme_id)
+    .orderBy('st.step_number')
+
+  return res;
 }
 
 module.exports = {
