@@ -20,7 +20,7 @@ const checkSchemeId = (req, res, next) => {
   }
 */
 const validateScheme = (req, res, next) => {
-
+next();
 }
 
 /*

@@ -99,7 +99,7 @@ async function findById(scheme_id) { // EXERCISE B
     .where('sc.scheme_id', scheme_id)
     .orderBy('st.step_number')
 
-  const stepsList = []
+  const stepsList = [];
   
   if (schemeArray[0].step_id) {
     await schemeArray.forEach(st => {
@@ -107,8 +107,8 @@ async function findById(scheme_id) { // EXERCISE B
         step_id: st.step_id,
         step_number: st.step_number,
         instructions: st.instructions
-      })
-    })
+      });
+    });
   }
 
   const scheme = {
@@ -120,7 +120,7 @@ async function findById(scheme_id) { // EXERCISE B
   return scheme;
 }
 
-function findSteps(scheme_id) { // EXERCISE C
+async function findSteps(scheme_id) { // EXERCISE C
   /*
     1C- Build a query in Knex that returns the following data.
     The steps should be sorted by step_number, and the array
@@ -141,12 +141,28 @@ function findSteps(scheme_id) { // EXERCISE C
         }
       ]
   */
+    const stepsArray = await db('schemes as sc')
+      .select('sc.scheme_name', 'st.step_id', 'st.step_number', 'st.instructions')
+      .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
+      .where('sc.scheme_id', scheme_id)
+      .orderBy('st.step_number');
+
+    if (stepsArray[0].step_id === null || !stepsArray[0].step_id) {
+      return [];
+    } else {
+      return stepsArray;
+    }
 }
 
-function add(scheme) { // EXERCISE D
+async function add(scheme) { // EXERCISE D
   /*
     1D- This function creates a new scheme and resolves to _the newly created scheme_.
   */
+  await db('schemes').insert(scheme);
+  const newScheme = await db('schemes as sc')
+    .select('sc.scheme_name', 'sc.scheme_id')
+    .where('sc.scheme_name', scheme.scheme_name);
+  return newScheme;
 }
 
 function addStep(scheme_id, step) { // EXERCISE E
