@@ -1,4 +1,4 @@
-const db = require('../../data/db-config');
+const Scheme = require('./scheme-model');
 /*
   If `scheme_id` does not exist in the database:
 
@@ -8,7 +8,12 @@ const db = require('../../data/db-config');
   }
 */
 const checkSchemeId = (req, res, next) => {
-  next();
+  const isExisting = Scheme.findById(req.params.scheme_id);
+  if (!isExisting[0]) {
+    res.status(404).json({message: `scheme with scheme_id ${req.params.scheme_id} not found`});
+  } else {
+    next();
+  }
 }
 
 /*
@@ -20,7 +25,12 @@ const checkSchemeId = (req, res, next) => {
   }
 */
 const validateScheme = (req, res, next) => {
-next();
+  const sc = req.body.scheme_name;
+  if(!sc || sc === undefined || typeof(sc) !== 'string') {
+    res.status(400).json({message: 'invalid scheme_name'});
+  } else {
+    next();
+  }
 }
 
 /*
@@ -33,7 +43,13 @@ next();
   }
 */
 const validateStep = (req, res, next) => {
-
+  const inst = req.body.instructions;
+  const st = req.body.step_number;
+  if (!inst || inst === undefined || typeof(inst) !== 'string' || typeof(st) !== 'number' || st > 1) {
+    res.status(400).json({message: 'invalid step'});
+  } else {
+    next();
+  }
 }
 
 module.exports = {
