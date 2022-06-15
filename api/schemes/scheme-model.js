@@ -162,13 +162,11 @@ async function add(scheme) { // EXERCISE D
   /*
     1D- This function creates a new scheme and resolves to _the newly created scheme_.
   */
-  await db('schemes').insert(scheme);
-  const newScheme = await db('schemes as sc')
-    .select('sc.scheme_name', 'sc.scheme_id')
-    .where('sc.scheme_name', scheme.scheme_name)
-    .first();
-  return newScheme.scheme_id;
+  const newSchemeId = await db('schemes').insert(scheme);
+  const newScheme = await findById(newSchemeId);
+  return newScheme;
 }
+  
 
 async function addStep(scheme_id, step) { // EXERCISE E
   /*
